@@ -1,0 +1,6 @@
+[user]
+	email = 58122827+msabur@users.noreply.github.com
+	name = msabur
+[core]
+	excludesFile = /home/mas/.global_gitignore
+	editor = nvim

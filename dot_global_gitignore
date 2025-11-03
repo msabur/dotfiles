@@ -1,0 +1,6 @@
+# tag files
+tags
+# vscode folder
+.vscode
+# pyenv python version
+.python-version

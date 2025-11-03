@@ -1,0 +1,112 @@
+call plug#begin('~/.vim/plugged')
+Plug 'cocopon/iceberg.vim'
+Plug 'itchyny/lightline.vim'
+Plug 'LunarWatcher/auto-pairs'
+Plug 'vim-scripts/TaskList.vim'
+Plug 'junegunn/vim-easy-align'
+Plug 'tpope/vim-vinegar'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-sleuth'
+Plug 'lambdalisue/suda.vim'
+Plug 'blankname/vim-fish'
+Plug 'vim-pandoc/vim-pandoc-syntax'
+Plug 'fladson/vim-kitty'
+Plug 'preservim/nerdtree'
+call plug#end()
+
+let g:python3_host_prog='/usr/bin/python3'
+let g:AutoPairsUseInsertedCount=1
+let g:markdown_fenced_languages = ['sql', 'vim']
+let g:pandoc#syntax#codeblocks#embeds#langs = ['sql', 'vim']
+let g:AutoPairsCompleteOnlyOnSpace = 1
+let g:AutoPairsMapBS = 1
+let g:lightline = {
+      \ 'colorscheme': 'PaperColor',
+      \ 'active': {
+      \	  'left': [ [ 'mode', 'paste' ],
+      \             [ 'cocstatus', 'readonly', 'filename', 'modified'  ] ]
+      \ },
+      \ 'component_function': {
+      \	  'cocstatus': 'coc#status'
+      \ },
+      \ }
+
+filetype plugin indent on
+syntax enable
+set termguicolors
+set background=light
+colo iceberg
+set number
+set autoindent
+set mouse=a
+set splitbelow
+set cino=:0 " don't indent case labels in a switch
+set scrolloff=1
+set cursorline
+set completeopt-=preview
+set noshowmode " because it's redundant with lightline
+set viewoptions-=options " so mkview doesn't save mappings
+set foldlevelstart=99 " start with all folds open after opening a file
+
+" Mappings
+cnoremap w!! w !sudo tee > /dev/null %
+nnoremap <silent> <esc> :noh<cr><esc>
+nnoremap <silent> - :e `dirname %` <cr>
+nnoremap <silent> <f5> :make!<cr>
+nnoremap <silent> <leader>rl :source ~/.vimrc<cr>
+nnoremap <silent> <leader>tb :call ToggleBackground()<cr>
+nnoremap <leader>n :NERDTreeToggle<CR>
+noremap y "+y
+nnoremap yy "+yy
+noremap Y "+y$
+noremap x "+x
+nnoremap dd "+dd
+vnoremap d "+d
+noremap D "+D
+noremap p "+p
+
+fun! ToggleBackground()
+  if &background ==# 'light'
+    set background=dark
+  else
+ set background=light
+  endif
+endfunction
+
+" Word-processing mode
+fun! Wp()
+	set linebreak
+	nnoremap j gj
+	nnoremap k gk
+	nnoremap 0 g0
+	nnoremap $ g$
+	set nonumber
+	setlocal spell spelllang=en_us
+	nnoremap <leader>z 1z=
+endfunction
+autocmd FileType text call Wp()
+
+" LaTeX word-processing mode. Same but with line numbers and no spellcheck
+fun! Wp_latex()
+	set linebreak
+	nnoremap j gj
+	nnoremap k gk
+	nnoremap 0 g0
+	nnoremap $ g$
+endfunction
+autocmd FileType tex call Wp_latex()
+
+" Toggle insert mode when switching to/from a terminal
+autocmd BufEnter term://* startinsert
+autocmd BufLeave term://* stopinsert
+
+" to make vim-pandoc-syntax work
+augroup pandoc_syntax
+	au! BufNewFile,BufFilePre,BufRead *.md set filetype=markdown.pandoc
+augroup END
+
+autocmd User CocStatusChange,CocDiagnosticChange call lightline#update()
+
+" mappings for vim-easy-align
+xmap ga <Plug>(EasyAlign)
+nmap ga <Plug>(EasyAlign)
