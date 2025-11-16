@@ -49,6 +49,7 @@ set viewoptions-=options " so mkview doesn't save mappings
 set foldlevelstart=99 " start with all folds open after opening a file
 
 " Mappings
+
 cnoremap w!! w !sudo tee > /dev/null %
 nnoremap <silent> <esc> :noh<cr><esc>
 nnoremap <silent> - :e `dirname %` <cr>
@@ -56,6 +57,7 @@ nnoremap <silent> <f5> :make!<cr>
 nnoremap <silent> <leader>rl :source ~/.vimrc<cr>
 nnoremap <silent> <leader>tb :call ToggleBackground()<cr>
 nnoremap <leader>n :NERDTreeToggle<CR>
+
 noremap y "+y
 nnoremap yy "+yy
 noremap Y "+y$
@@ -64,6 +66,13 @@ nnoremap dd "+dd
 vnoremap d "+d
 noremap D "+D
 noremap p "+p
+
+noremap <A-h> <C-w>h
+noremap <A-j> <C-w>j
+noremap <A-k> <C-w>k
+noremap <A-l> <C-w>l
+
+tnoremap <Esc> <C-\><C-n>
 
 fun! ToggleBackground()
   if &background ==# 'light'
