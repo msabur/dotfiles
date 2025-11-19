@@ -84,9 +84,10 @@ print(f"🕌 {next_prayer[0]} in {time_left}")
 print("---")
 
 max_name_len = max([len(name) for name in prayers_dt])
-width = max_name_len + 15
+width = max_name_len + 16
 
-print(f"{now.strftime('%B %d, %Y').center(width)}|trim=false font=monospace")
+heading = f"📅 {now.strftime('%d %b %Y')}"
+print(f"{heading.center(width)}|trim=false font=monospace")
 
 for name, dt in prayers_dt.items():
     line = f"{name:<{max_name_len}}: {dt.strftime('%I:%M %p')}"
