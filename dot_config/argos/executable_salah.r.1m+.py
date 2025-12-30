@@ -29,8 +29,7 @@ except ModuleNotFoundError:
     sys.exit(1)
 
 #### Settings
-lat = 28.3047    # Kissimmee, FL
-lon = -81.4167  # Kissimmee, FL
+lat, lon = 28.3047, -81.4167 # Kissimmee, FL
 fajr_isha_method = 5
 madhab = 2
 
@@ -57,15 +56,18 @@ prayers = {
 prayers_dt = { name: datetime.datetime.combine(date=today, time=time)
                    for name, time in prayers.items() }
 
-# Determine next prayer
+# Determine current and next prayer
+current_prayer = None
 next_prayer = None
 for name, dt in prayers_dt.items():
     if dt > now:
         next_prayer = (name, dt)
         break
+    else:
+        current_prayer = (name, dt)
 
 # If all prayers passed, next is tomorrow's Fajr
-if not next_prayer:
+if next_prayer is None:
     tomorrow = today + datetime.timedelta(days=1)
     pt_tomorrow = Prayer(pconf, tomorrow)
     fajr_tomorrow = pt_tomorrow.fajr_time()
@@ -90,5 +92,12 @@ heading = f"📅 {now.strftime('%d %b %Y')}"
 print(f"{heading.center(width)}|trim=false font=monospace")
 
 for name, dt in prayers_dt.items():
-    line = f"{name:<{max_name_len}}: {dt.strftime('%I:%M %p')}"
-    print(f"{line.center(width)}|font=monospace trim=false")
+    line = f"{name:<{max_name_len}}: {dt.strftime('%I:%M %p')}".center(width)
+    to_mono = lambda s: f"<span font='monospace'>{s}</span>"
+    to_bold = lambda s: f"<b>{s}</b>"
+    to_italics = lambda s: f"<i>{s}</i>"
+    
+    if current_prayer and name == current_prayer[0]:
+        print(to_mono(to_bold(to_italics(line))))
+    else:
+        print(to_mono(line))

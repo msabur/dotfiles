@@ -6,4 +6,3 @@ end
 alias open=xdg-open
 alias vim=nvim
 alias tb="nc termbin.com 9999"
-
