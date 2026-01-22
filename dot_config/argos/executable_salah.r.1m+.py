@@ -23,6 +23,7 @@ import time
 
 try:
     from pyIslam.praytimes import PrayerConf, Prayer
+    from pyIslam.hijri import HijriDate
 except ModuleNotFoundError:
     print("⚠️run pip install islam⚠️")
     import sys
@@ -43,7 +44,7 @@ now = datetime.datetime.now()
 pconf = PrayerConf(lon, lat, tz, fajr_isha_method, madhab, enable_summer_time=is_dst)
 pt = Prayer(pconf, today)
 
-prayers = {
+timings = {
     "Fajr": pt.fajr_time(),
     "Sunrise": pt.sherook_time(),
     "Dhuhr": pt.dohr_time(),
@@ -52,52 +53,55 @@ prayers = {
     "Isha": pt.ishaa_time()
 }
 
-# Convert prayer times to datetime objects
-prayers_dt = { name: datetime.datetime.combine(date=today, time=time)
-                   for name, time in prayers.items() }
+# Convert to datetime objects
+timings_dt = { name: datetime.datetime.combine(date=today, time=time)
+                   for name, time in timings.items() }
 
-# Determine current and next prayer
-current_prayer = None
-next_prayer = None
-for name, dt in prayers_dt.items():
+# Determine current and next timing
+current_timing = None
+next_timing = None
+for name, dt in timings_dt.items():
     if dt > now:
-        next_prayer = (name, dt)
+        next_timing = (name, dt)
         break
+    elif name == "Sunrise":
+        current_timing = None
     else:
-        current_prayer = (name, dt)
+        current_timing = (name, dt)
 
-# If all prayers passed, next is tomorrow's Fajr
-if next_prayer is None:
+# If all timings passed, next is tomorrow's Fajr
+if next_timing is None:
     tomorrow = today + datetime.timedelta(days=1)
     pt_tomorrow = Prayer(pconf, tomorrow)
     fajr_tomorrow = pt_tomorrow.fajr_time()
     fajr_dt = datetime.datetime.combine(date=tomorrow, time=fajr_tomorrow)
-    next_prayer = ("Fajr", fajr_dt)
+    next_timing = ("Fajr", fajr_dt)
 
 # Time remaining
-delta = next_prayer[1] - now
+delta = next_timing[1] - now
 hours, remainder = divmod(int(delta.total_seconds()), 3600)
 minutes = remainder // 60
 time_left = f"{hours}h {minutes}m" if hours else f"{minutes}m"
 
 # === Output to Argos ===
 
-print(f"🕌 {next_prayer[0]} in {time_left}")
+print(f"🕌 {next_timing[0]} in {time_left}")
 print("---")
 
-max_name_len = max([len(name) for name in prayers_dt])
+max_name_len = max([len(name) for name in timings_dt])
 width = max_name_len + 16
 
-heading = f"📅 {now.strftime('%d %b %Y')}"
+# heading = f"📅 {now.strftime('%d %b %Y')}"
+heading = f"📅 {HijriDate.today().format(2)}"
 print(f"{heading.center(width)}|trim=false font=monospace")
 
-for name, dt in prayers_dt.items():
+for name, dt in timings_dt.items():
     line = f"{name:<{max_name_len}}: {dt.strftime('%I:%M %p')}".center(width)
     to_mono = lambda s: f"<span font='monospace'>{s}</span>"
     to_bold = lambda s: f"<b>{s}</b>"
     to_italics = lambda s: f"<i>{s}</i>"
     
-    if current_prayer and name == current_prayer[0]:
+    if current_timing and name == current_timing[0]:
         print(to_mono(to_bold(to_italics(line))))
     else:
         print(to_mono(line))
