@@ -29,10 +29,11 @@ except ModuleNotFoundError:
     import sys
     sys.exit(1)
 
-#### Settings
+# Settings
 lat, lon = 28.3047, -81.4167 # Kissimmee, FL
 fajr_isha_method = 5
 madhab = 2
+hijri_offset = 0
 
 # https://stackoverflow.com/a/3168394
 is_dst = time.daylight and time.localtime().tm_isdst > 0
@@ -53,7 +54,6 @@ timings = {
     "Isha": pt.ishaa_time()
 }
 
-# Convert to datetime objects
 timings_dt = { name: datetime.datetime.combine(date=today, time=time)
                    for name, time in timings.items() }
 
@@ -77,31 +77,38 @@ if next_timing is None:
     fajr_dt = datetime.datetime.combine(date=tomorrow, time=fajr_tomorrow)
     next_timing = ("Fajr", fajr_dt)
 
-# Time remaining
 delta = next_timing[1] - now
 hours, remainder = divmod(int(delta.total_seconds()), 3600)
 minutes = remainder // 60
 time_left = f"{hours}h {minutes}m" if hours else f"{minutes}m"
 
-# === Output to Argos ===
+# Output to Argos
 
 print(f"🕌 {next_timing[0]} in {time_left}")
 print("---")
 
-max_name_len = max([len(name) for name in timings_dt])
-width = max_name_len + 16
+lineSpecs: list[tuple[str, bool]] = [] # [text, shouldHighlight]
 
-# heading = f"📅 {now.strftime('%d %b %Y')}"
-heading = f"📅 {HijriDate.today().format(2)}"
-print(f"{heading.center(width)}|trim=false font=monospace")
+heading = f"{HijriDate.today(hijri_offset).format(lang=2)}"
+
+max_name_len = max([len(name) for name in timings_dt])
+
+to_mono = lambda s: f"<span font='monospace'>{s}</span>"
+to_bold = lambda s: f"<b>{s}</b>"
+to_italics = lambda s: f"<i>{s}</i>"
 
 for name, dt in timings_dt.items():
-    line = f"{name:<{max_name_len}}: {dt.strftime('%I:%M %p')}".center(width)
-    to_mono = lambda s: f"<span font='monospace'>{s}</span>"
-    to_bold = lambda s: f"<b>{s}</b>"
-    to_italics = lambda s: f"<i>{s}</i>"
-    
+    line = f"{name:<{max_name_len+5}}: {dt.strftime('%I:%M %p')}"
     if current_timing and name == current_timing[0]:
-        print(to_mono(to_bold(to_italics(line))))
+        lineSpecs.append((line, True))
     else:
-        print(to_mono(line))
+        lineSpecs.append((line, False))
+
+max_line_length = max([len(text) for text, _ in lineSpecs])
+print(to_mono(heading.center(max_line_length)))
+
+for text, shouldHighlight in lineSpecs:
+    if shouldHighlight:
+        print(to_mono(to_italics(to_bold(text))))
+    else:
+        print(to_mono(text))
