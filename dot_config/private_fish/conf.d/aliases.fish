@@ -6,3 +6,4 @@ end
 alias open=xdg-open
 alias vim=nvim
 alias tb="nc termbin.com 9999"
+alias fastfetch="fastfetch --config examples/13.jsonc"
