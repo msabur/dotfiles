@@ -6,4 +6,5 @@ if status is-interactive
     set -gx PYENV_ROOT $HOME/.pyenv
     test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin
     set -g fish_greeting
+    set -gx EDITOR /usr/bin/nvim
 end

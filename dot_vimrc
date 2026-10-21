@@ -31,6 +31,8 @@ let g:lightline = {
       \ },
       \ }
 
+" Options
+
 filetype plugin indent on
 syntax enable
 set termguicolors
