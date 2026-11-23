@@ -57,15 +57,6 @@ nnoremap <silent> <leader>rl :source ~/.vimrc<cr>
 nnoremap <silent> <leader>tb :call ToggleBackground()<cr>
 nnoremap <leader>n :NERDTreeToggle<CR>
 
-noremap y "+y
-nnoremap yy "+yy
-noremap Y "+y$
-noremap x "+x
-nnoremap dd "+dd
-vnoremap d "+d
-noremap D "+D
-noremap p "+p
-
 noremap <A-h> <C-w>h
 noremap <A-j> <C-w>j
 noremap <A-k> <C-w>k
