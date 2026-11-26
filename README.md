@@ -2,6 +2,6 @@
 
 Personal dotfiles.
 
-Commands:
+Usage:
 
 - install: `stow .`
