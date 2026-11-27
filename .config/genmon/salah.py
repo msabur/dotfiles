@@ -1,4 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+#
+# /// script
+# dependencies = [
+#   "islam==2.2.0"
+# ]
+# ///
 """
 Fajr and Ishaa reference:
 -------------------------------------
@@ -25,7 +31,7 @@ try:
     from pyIslam.praytimes import PrayerConf, Prayer
     from pyIslam.hijri import HijriDate
 except ModuleNotFoundError:
-    print("⚠️run pip install islam⚠️")
+    print("please install the islam module")
     import sys
     sys.exit(1)
 
@@ -82,20 +88,13 @@ hours, remainder = divmod(int(delta.total_seconds()), 3600)
 minutes = remainder // 60
 time_left = f"{hours}h {minutes}m" if hours else f"{minutes}m"
 
-# Output to Argos
+# Output
 
-print(f"🕌 {next_timing[0]} in {time_left}")
-print("---")
-
-lineSpecs: list[tuple[str, bool]] = [] # [text, shouldHighlight]
+lineSpecs: list[tuple[str, bool]] = [] # [text, highlight]
 
 heading = f"{HijriDate.today(hijri_offset).format(lang=2)}"
 
 max_name_len = max([len(name) for name in timings_dt])
-
-to_mono = lambda s: f"<span font='monospace'>{s}</span>"
-to_bold = lambda s: f"<b>{s}</b>"
-to_italics = lambda s: f"<i>{s}</i>"
 
 for name, dt in timings_dt.items():
     line = f"{name:<{max_name_len+5}}: {dt.strftime('%I:%M %p')}"
@@ -105,10 +104,13 @@ for name, dt in timings_dt.items():
         lineSpecs.append((line, False))
 
 max_line_length = max([len(text) for text, _ in lineSpecs])
-print(to_mono(heading.center(max_line_length)))
 
-for text, shouldHighlight in lineSpecs:
-    if shouldHighlight:
-        print(to_mono(to_italics(to_bold(text))))
-    else:
-        print(to_mono(text))
+print(f"<txt>{next_timing[0]} in {time_left}</txt>")
+
+lines = [f"<b>{heading.center(max_line_length)}</b>"]
+for text, highlight in lineSpecs:
+    lines.append(f'<span foreground="#f59e0b"><b>{text}</b></span>' if highlight else text)
+
+print("<tool><tt>" + '\n'.join(lines) + "</tt></tool>")
+
+print("<css>.genmon_value { padding-left: 10px; padding-right: 10px; }</css>")
