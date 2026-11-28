@@ -1,0 +1,8 @@
+# both Shift keys pressed together will trigger Caps Lock
+setxkbmap -option shift:both_capslock
+
+# map caps lock to backspace, enable key repeat on it
+setxkbmap -option caps:backspace && xset r 66
+
+# clicking both mouse buttons will do a middle click
+xinput set-prop "Logitech M510" "libinput Middle Emulation Enabled" 1
